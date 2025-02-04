@@ -1,2 +1,0 @@
-{"level":"debug","user":"user7657","time":"2025-02-04T13:37:35-03:00","message":"Hello"}
-{"level":"debug","user":"user7657","time":"2025-02-04T13:37:47-03:00","message":"hows going"}
