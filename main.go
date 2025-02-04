@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 var upgrader = websocket.Upgrader{
@@ -20,7 +21,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func websocketHandler(w http.ResponseWriter, r *http.Request) {
+func websocketHandler(c *gin.Context) {
 
 	file, err := os.OpenFile("messages.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
@@ -30,7 +31,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger := zerolog.New(file).With().Timestamp().Logger()
 
-	conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 
 	name := fmt.Sprintf("user%d", int(math.Floor(rand.Float64()*10000)))
 
@@ -62,6 +63,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/websocket", websocketHandler)
-	log.Fatal().Err(http.ListenAndServe(":8080", nil))
+	router := gin.Default()
+	router.GET("/websocket", websocketHandler)
+	router.Run(":8080")
 }
